@@ -11,7 +11,8 @@ But in the spirit of C.S. Weekly [(read about it here)](https://medium.com/@vapu
 I Quickly found these pros:
 - It was a quick refresher on using raw sqls commands
 - It's fast
-- I didn't need to wait to get a UI spun up or start pgadmin every time I want to interact with my db. Instead I was able to starting using the tool immediately.
+- I didn't need to wait to get a UI spun up or start pgadmin every time I want to interact with my db. Instead I was able to start
+using the tool immediately.
 
 And these cons:
 - It's harder to debug
@@ -30,7 +31,7 @@ and setup a database to make use of the tool as well.
 > **WARNING** This program was developed on a Windows 10 machine and was not tested elsewhere. There are likely obvious bugs
 if porting the software as-is to other platforms.
 
-If you wish to use this program, make sure you have postgresql installed
+If you wish to use this program, make sure you have [postgresql installed](https://www.postgresql.org/download/)
 in your system and in your path. You can always test if this is the case
 by simply running one of the binaries included with the installation:
 
@@ -38,9 +39,14 @@ by simply running one of the binaries included with the installation:
 createdb
 ```
 
+
 ### Creating
 If using this tool for the first time, you can simply run `my-music --create`. However, **make sure
-you are in the same directory as the script**.
+you are in the same directory as the script**. This step is not necessary, though, as you can create
+a database using any other mechanism such as `createdb` or using pgadmin.
+
+Be sure to call your database `MyMusic` OR change the `dbname` variable in the script if you use
+a different name.
 
 ### Setting an Alias
 Other than creating the db, the script can be run from anywhere. You can add the script to a `/local/bin`
@@ -67,7 +73,7 @@ my-music [[-c dbname user] | [-d dbname user] | [-h] | [-i]]
 ```
 
 ### Changing Default Database, User, Password
-The database name, user and password are all hard-coded in the script for simplicity.
+> **SECURITY** WARNING: The database name, user and password are all hard-coded in the script for simplicity.
 It is assumed that this is to be run on **personal machines only**.
 
 The defaults are set to:
@@ -78,6 +84,10 @@ The defaults are set to:
 Simply change the values in the file `my-music` if you use a different setup.
 
 ```bash
+########## Constants ##########
+.
+.
+.
 ## Database info
 user=postgres     # change to your username
 password=postgres # change to your password
