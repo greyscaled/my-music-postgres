@@ -49,6 +49,7 @@ addRecord ()
 	
 	if [[ $artistid == "" ]]; then
 		addArtist
+		artistid=`PGPASSWORD=$password psql --dbname=$dbname --quiet --tuples-only --username=$user --command="SELECT id FROM Artists WHERE name = lower('${artist}');"`
 	fi
 
 	echo -n "Label: "
@@ -57,6 +58,7 @@ addRecord ()
 	
 	if [[ $labelid == "" ]]; then
 		addLabel
+		labelid=`PGPASSWORD=$password psql --dbname=$dbname --quiet --tuples-only --username=$user --command="SELECT id FROM Labels WHERE name = lower('${label}');"`
 	fi
 
 	echo -n "Record title: "
@@ -117,14 +119,74 @@ addRecord ()
 	clear
 }
 
+listLiked ()
+{
+	OFFSET=0
+	LIMIT=20
+	PGPASSWORD=$password psql --quiet --dbname=$dbname --username=$user --command="SELECT Records.title, Artists.name AS artist, Labels.name AS label FROM Records INNER JOIN Artists ON Records.artist = Artists.id INNER JOIN Labels ON Records.label = Labels.id WHERE liked = true AND purchased = false LIMIT $LIMIT OFFSET $OFFSET;"
+
+	while [ true ]; do
+		echo -n "more --- [b to go back]"
+		read action
+		case $action in
+			b )
+				return
+				;;
+			* )
+				OFFSET=$(( OFFSET + 20 ))
+				PGPASSWORD=$password psql --quiet --dbname=$dbname --username=$user --command="SELECT Records.title, Artists.name AS artist, Labels.name AS label FROM Records INNER JOIN Artists ON Records.artist = Artists.id INNER JOIN Labels ON Records.label = Labels.id LIMIT $LIMIT OFFSET $OFFSET;"
+		esac
+	done
+}
+
 listenToRecord ()
 {
-	echo "listen to record"
+	recordid=`PGPASSWORD=$password psql --dbname=$dbname --quiet --tuples-only --username=$user --command="SELECT id FROM Records WHERE listened = false AND link != '' ORDER BY random() LIMIT 1;"`
+	
+	if [ "$recordid" == "" ]; then
+		echo "No unlistened records"
+		read
+		return
+	fi
+
+	recordLink=`PGPASSWORD=$password psql --dbname=$dbname --quiet --tuples-only --username=$user --command="SELECT link FROM Records WHERE id = $recordid;"`
+	start chrome $recordLink
+
+	listened=true
+
+	echo -n "Did you like? (y|n) "
+	read liked
+	if [ "$liked" == "y" ]; then
+		liked=true
+	else
+		liked=false
+	fi
+
+	echo -n "Did you purchase? (y|n) "
+	read purchased
+	if [ "$purchased" == "y" ]; then
+		purchased=true
+	else
+		purchased=false
+	fi
+
+	PGPASSWORD=$password psql --echo-all --dbname=$dbname --username=$user --command="UPDATE Records SET listened = $listened, liked = $liked, purchased = $purchased WHERE id = $recordid;"
 }
 
 purchaseRecord ()
 {
-	echo "purchase record"
+	echo -n "Which record did you purchase? "
+	read title
+
+	recordId=`PGPASSWORD=$password psql --dbname=$dbname --quiet --tuples-only --username=$user --command="SELECT id FROM Records WHERE title = lower('${title}');"`
+
+	if ! [[ $recordId != "" ]]; then
+		echo "Record doesnt exist [hit enter]"
+		read
+		return
+	fi
+
+	PGPASSWORD=$password psql --echo-all --dbname=$dbname --username=$user --command="UPDATE Records SET purchased = true WHERE id = $recordId;"
 }
 
 createDatabase ()
@@ -169,7 +231,7 @@ mainLoop ()
 {
 	clear
 	while [ true ]; do
-		echo -n "a (add artist)|l (add label)|r (add record)|listen|purchase (q to quit)> "
+		echo -n "a (add artist)|l (add label)|r (add record)|liked|listen|purchase| (q to quit)> "
 		read action
 		case $action in
 			a )
@@ -180,6 +242,9 @@ mainLoop ()
 				;;
 			r )
 				addRecord
+				;;
+			liked )
+				listLiked
 				;;
 			listen )
 				listenToRecord
