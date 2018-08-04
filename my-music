@@ -259,7 +259,7 @@ mainLoop ()
 				echo -e "command not recognized\n"
 		esac
 	done
-	exit
+	exit 0
 }
 
 myMusicUsage ()
