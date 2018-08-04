@@ -1,0 +1,233 @@
+#!/bin/bash
+
+########## Constants ##########
+
+## Output
+bold=$(tput bold)
+clear=$(tput clear)
+normal=$(tput sgr0)
+tab=$(tput cuf 4)
+
+## Database info
+user=postgres
+password=postgres
+dbname=MyMusic
+tables="Labels, Artists, Records and RecordArtists"
+
+########### Functions ##########
+addArtist ()
+{
+	echo "Adding new Artist"
+	echo -n "Artist: "
+	read artist
+
+	echo -n "add website? [enter if none]: "
+	read link
+
+	PGPASSWORD=$password psql --echo-all --dbname=$dbname --username=$user --command="INSERT into Artists (name, website) SELECT lower('${artist}'), '${link}' WHERE NOT EXISTS (SELECT * FROM Artists WHERE name = lower('${artist}'));"
+	clear
+}
+
+addLabel ()
+{
+	echo "Adding new Label"
+	echo -n "Label: "
+	read label
+
+	echo -n "bandcamp? [enter if none]: "
+	read bandcamp
+
+	PGPASSWORD=$password psql --echo-all --dbname=$dbname --username=$user --command="INSERT into Labels (name, bandcamp) SELECT lower('${label}'), '${bandcamp}' WHERE NOT EXISTS (SELECT * FROM Labels WHERE name = lower('${label}'));"
+	clear
+}
+
+addRecord ()
+{
+	echo -n "Artist: "
+	read artist
+	artistid=`PGPASSWORD=$password psql --dbname=$dbname --quiet --tuples-only --username=$user --command="SELECT id FROM Artists WHERE name = lower('${artist}');"`
+	
+	if [[ $artistid == "" ]]; then
+		addArtist
+	fi
+
+	echo -n "Label: "
+	read label
+	labelid=`PGPASSWORD=$password psql --dbname=$dbname --quiet --tuples-only --username=$user --command="SELECT id FROM Labels WHERE name = lower('${label}');"`
+	
+	if [[ $labelid == "" ]]; then
+		addLabel
+	fi
+
+	echo -n "Record title: "
+	read title
+
+	alreadyExists=`PGPASSWORD=$password psql --dbname=$dbname --quiet --tuples-only --username=$user --command="SELECT id FROM Records WHERE title = lower('${title}');"`
+
+	if ! [[ $alreadyExists == "" ]]; then
+		echo "Record already exists [hit enter]"
+		read
+		return
+	fi
+
+	echo -n "Record link: "
+	read link
+
+	echo -n "Did you listen? (y|n) "
+	read listened
+	if [ "$listened" == "y" ]; then
+		listened=true
+	else
+		listened=false
+	fi
+
+	echo -n "Did you like? (y|n) "
+	read liked
+	if [ "$liked" == "y" ]; then
+		liked=true
+	else
+		liked=false
+	fi
+
+	echo -n "Did you purchase? (y|n) "
+	read purchased
+	if [ "$purchased" == "y" ]; then
+		purchased=true
+	else
+		purchased=false
+	fi
+
+	echo "please confirm: "
+	echo "artist: $artist "
+	echo "label: $label "
+	echo "title: $title "
+	echo "link: $link "
+	echo "listened: $listened "
+	echo "liked: $liked "
+	echo "purchased: $purchased"
+	echo -n "ok? (y|n) "
+	read confirm
+	if [ "$confirm" != "y" ]; then
+		return
+	fi
+
+	echo "confirmed"
+	PGPASSWORD=$password psql --echo-all --dbname=$dbname --username=$user --command="INSERT into Records (title, artist, label, link, listened, liked, purchased) VALUES(lower('${title}'), $artistid, $labelid, trim('${link}'), $listened, $liked, $purchased);"
+
+	clear
+}
+
+listenToRecord ()
+{
+	echo "listen to record"
+}
+
+purchaseRecord ()
+{
+	echo "purchase record"
+}
+
+createDatabase ()
+{
+	if [ "$1" != "" ]; then
+		dbname=$1
+	else
+		dbname="MyMusic"
+	fi
+
+	# echo $dbname > .config
+
+	if [ "$2" != "" ]; then
+		user=$2
+	else
+		user="postgres"
+	fi
+
+	# echo $user >> .config
+
+	echo "creating music database named ${dbname} with user ${user}"
+	createdb --echo --owner=$user --username=$user $dbname
+	echo "creating tables ${tables}"
+	PGPASSWORD=$password psql --echo-all --dbname=$dbname --file=sql/create_tables.sql --username=$user
+}
+
+deleteDatabase ()
+{
+	if [ "$1" != "" ]; then
+		dbname=$1
+	fi
+
+	if [ "$2" != "" ]; then
+		user=$2
+	fi
+
+	echo "deleting music database named ${dbname} for user ${user}"
+	dropdb --echo --username=$user $dbname
+}
+
+mainLoop ()
+{
+	clear
+	while [ true ]; do
+		echo -n "a (add artist)|l (add label)|r (add record)|listen|purchase (q to quit)> "
+		read action
+		case $action in
+			a )
+				addArtist
+				;;
+			l )
+				addLabel
+				;;
+			r )
+				addRecord
+				;;
+			listen )
+				listenToRecord
+				;;
+			purchase )
+				purchaseRecord
+				;;
+			q | quit )
+				exit 0
+				;;
+			* )
+				echo -e "command not recognized\n"
+		esac
+	done
+	exit
+}
+
+myMusicUsage ()
+{
+	echo -e "${clear}${bold}my-music${normal}\n\n"
+	echo -e "[[-c dbname user] | [-d dbname user] | [-h] | [-i]]\n\n"
+	echo "${tab}-c, --create - creates database${normal}"
+	echo "${tab}-d, --delete - deletes database${normal}. This cannot be undone."
+	echo "${tab}${tab} dbname [default=MyMusic] - Name of database to create"
+	echo "${tab}${tab} user [default=postgres] - Name of database owner and user"
+	echo "${tab}-h, --help - displays command line options${normal}"
+	echo "${tab}-i, --interactive - interactively add artists, labels, records or listen and purchase."
+}
+
+########### Main ##########
+case $1 in
+	-i | --interactive )
+		mainLoop
+		;;
+	-c | --create )
+		createDatabase $2 $3
+		;;
+	-d | --delete )
+		deleteDatabase $2 $3
+		;;
+	-h | --help )
+		myMusicUsage
+		exit
+		;;
+	* )
+		myMusicUsage
+		exit 1
+
+esac
+echo "done"
+exit 0
