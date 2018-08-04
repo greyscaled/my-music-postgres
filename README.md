@@ -2,7 +2,7 @@
 [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/60-percent-of-the-time-works-every-time.svg)](https://forthebadge.com)
 
-# Music-postgres
+# My Music Postgres
 As a DJ, I felt there was a need to create a local database to manage my music.
 As a developer, I'm used to spinning up and interacting with databases using ORMs and advanced GUI clients.
 
