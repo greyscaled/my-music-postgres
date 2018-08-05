@@ -193,16 +193,12 @@ createDatabase ()
 {
 	if [ "$1" != "" ]; then
 		dbname=$1
-	else
-		dbname="MyMusic"
 	fi
 
 	# echo $dbname > .config
 
 	if [ "$2" != "" ]; then
 		user=$2
-	else
-		user="postgres"
 	fi
 
 	# echo $user >> .config
