@@ -1,0 +1,12 @@
+version: 1.0.{build}
+branches:
+  except:
+    - config
+image: ubuntu
+services:
+  - postgresql
+install:
+  - chmod u+x my-music
+  - createdb --echo --owner=postgres --username=postgres --no-password MyMusic
+build: off
+  - ./my-music --help
