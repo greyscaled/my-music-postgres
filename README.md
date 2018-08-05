@@ -2,7 +2,7 @@
 [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/60-percent-of-the-time-works-every-time.svg)](https://forthebadge.com)
 
-# My Music Postgres
+# My Music Postgres :musical_note: :cd:
 
 Bash interface to a local Postgres Database for music management.
 
