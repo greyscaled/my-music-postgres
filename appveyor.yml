@@ -9,9 +9,6 @@ install:
   - chmod u+x my-music
 build: off
 before_test:
-  - set PGUSER=postgres
-  - set PGPASSWORD=Password12!
-  - PATH=C:\Program Files\PostgreSQL\9.6\bin\;%PATH%
   - createdb MyMusic
 test_script:
   - ./my-music --help
