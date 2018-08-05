@@ -7,9 +7,11 @@ services:
   - postgresql
 install:
   - chmod u+x my-music
+build: off
+before_test:
   - set PGUSER=postgres
   - set PGPASSWORD=Password12!
   - createdb MyMusic
-build: off
+  - PATH=C:\Program Files\PostgreSQL\9.6\bin\;%PATH%
 test_script:
   - ./my-music --help
