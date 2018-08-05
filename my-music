@@ -193,14 +193,10 @@ createDatabase ()
 {
 	if [ "$1" != "" ]; then
 		dbname=$1
-	else
-		dbname="MyMusic"
 	fi
 
 	if [ "$2" != "" ]; then
 		user=$2
-	else
-		user="postgres"
 	fi
 
 	echo "creating music database named ${dbname} with user ${user}"
