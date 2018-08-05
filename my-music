@@ -2,6 +2,9 @@
 
 ########## VARIABLES ##########
 
+## Helpers
+yesReg="^(y|Y)(es)?$"
+
 ## Output
 bold=$(tput bold)
 clear=$(tput clear)
@@ -77,7 +80,7 @@ addRecord ()
 
 	echo -n "Did you listen? (y|n) "
 	read listened
-	if [ "$listened" == "y" ]; then
+	if [[ "$listened" =~ $yesReg ]]; then
 		listened=true
 	else
 		listened=false
@@ -85,7 +88,7 @@ addRecord ()
 
 	echo -n "Did you like? (y|n) "
 	read liked
-	if [ "$liked" == "y" ]; then
+	if [[ "$liked" =~ $yesReg ]]; then
 		liked=true
 	else
 		liked=false
@@ -93,7 +96,7 @@ addRecord ()
 
 	echo -n "Did you purchase? (y|n) "
 	read purchased
-	if [ "$purchased" == "y" ]; then
+	if [[ "$purchased" =~ $yesReg ]]; then
 		purchased=true
 	else
 		purchased=false
@@ -109,7 +112,8 @@ addRecord ()
 	echo "purchased: $purchased"
 	echo -n "ok? (y|n) "
 	read confirm
-	if [ "$confirm" != "y" ]; then
+	if ! [[ "$confirm" =~ $yesReg ]]; then
+		echo "Not confirmed. Returning"
 		return
 	fi
 
@@ -156,7 +160,7 @@ listenToRecord ()
 
 	echo -n "Did you like? (y|n) "
 	read liked
-	if [ "$liked" == "y" ]; then
+	if [[ "$liked" =~ $yesReg ]]; then
 		liked=true
 	else
 		liked=false
@@ -164,7 +168,7 @@ listenToRecord ()
 
 	echo -n "Did you purchase? (y|n) "
 	read purchased
-	if [ "$purchased" == "y" ]; then
+	if [[ "$purchased" =~ $yesReg ]]; then
 		purchased=true
 	else
 		purchased=false
