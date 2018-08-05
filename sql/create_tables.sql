@@ -23,20 +23,3 @@ CREATE TABLE Records
   liked boolean NOT NULL DEFAULT false,
   purchased boolean NOT NULL DEFAULT false
 );
-
--- CREATE TABLE RecordArtists
--- (
---   Recordid integer NOT NULL,
---   Artistid integer NOT NULL,
---   CONSTRAINT Recordid_fk
---     FOREIGN KEY (Recordid)
---     REFERENCES Records(id)
---     ON UPDATE CASCADE
---     ON DELETE CASCADE,
---   CONSTRAINT Artistid_fk
---     FOREIGN KEY (Artistid) 
---     REFERENCES Artists(id)
---     ON UPDATE CASCADE
---     ON DELETE CASCADE,
---   CONSTRAINT RecordArtists_pkey PRIMARY KEY (Recordid, Artistid)
--- );
