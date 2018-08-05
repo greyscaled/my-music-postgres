@@ -1,6 +1,6 @@
 #!/bin/bash
 
-########## Constants ##########
+########## VARIABLES ##########
 
 ## Output
 bold=$(tput bold)
@@ -14,7 +14,7 @@ password=postgres
 dbname=MyMusic
 tables="Labels, Artists and Records"
 
-########### Functions ##########
+########### PROCEDURES ##########
 addArtist ()
 {
 	echo "Adding new Artist"
@@ -197,15 +197,11 @@ createDatabase ()
 		dbname="MyMusic"
 	fi
 
-	# echo $dbname > .config
-
 	if [ "$2" != "" ]; then
 		user=$2
 	else
 		user="postgres"
 	fi
-
-	# echo $user >> .config
 
 	echo "creating music database named ${dbname} with user ${user}"
 	createdb --echo --owner=$user --username=$user $dbname
