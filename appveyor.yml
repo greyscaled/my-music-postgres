@@ -1,0 +1,14 @@
+version: 1.0.{build}
+branches:
+  except:
+    - config
+image: ubuntu
+services:
+  - postgresql
+install:
+  - chmod u+x my-music
+build: off
+before_test:
+  - createdb MyMusic
+test_script:
+  - ./my-music --help
