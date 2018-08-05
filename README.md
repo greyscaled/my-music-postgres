@@ -1,3 +1,4 @@
+[![Build status](https://ci.appveyor.com/api/projects/status/c4ukil1jkkiljxp2/branch/master?svg=true)](https://ci.appveyor.com/project/vapurrmaid/my-music-postgres/branch/master)
 [![forthebadge](https://forthebadge.com/images/badges/fuck-it-ship-it.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/built-with-love.svg)](https://forthebadge.com)
 [![forthebadge](https://forthebadge.com/images/badges/60-percent-of-the-time-works-every-time.svg)](https://forthebadge.com)
